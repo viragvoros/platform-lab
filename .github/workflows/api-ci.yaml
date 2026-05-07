@@ -1,0 +1,14 @@
+# Lint, test, build, and push the platform-api container image.
+# Triggers on changes under platform-api/.
+name: api-ci
+on:
+  push:
+    paths: ['platform-api/**', '.github/workflows/api-ci.yaml']
+  pull_request:
+    paths: ['platform-api/**']
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # TODO: setup uv, run ruff + pytest, build & push image to ghcr.io

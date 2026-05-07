@@ -1,0 +1,14 @@
+# Build and test the Go CLI; release binaries on tags via goreleaser.
+name: cli-ci
+on:
+  push:
+    paths: ['platctl/**', '.github/workflows/cli-ci.yaml']
+    tags: ['v*']
+  pull_request:
+    paths: ['platctl/**']
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # TODO: setup-go, go test ./..., goreleaser on tag

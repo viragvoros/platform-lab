@@ -1,0 +1,8 @@
+# uv-managed FastAPI service.
+# Initialize properly with: cd platform-api && uv init --package platform-api
+[project]
+name = "platform-api"
+version = "0.1.0"
+description = "Self-service Kubernetes environments API"
+requires-python = ">=3.12"
+dependencies = []

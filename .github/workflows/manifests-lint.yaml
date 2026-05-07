@@ -1,0 +1,13 @@
+# Validate Kubernetes manifests and kustomize overlays.
+name: manifests-lint
+on:
+  push:
+    paths: ['apps/**', 'infra/**', '.github/workflows/manifests-lint.yaml']
+  pull_request:
+    paths: ['apps/**', 'infra/**']
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # TODO: kubeconform, kustomize build, helm lint
