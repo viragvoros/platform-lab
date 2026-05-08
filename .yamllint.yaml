@@ -1,0 +1,31 @@
+extends: default
+
+rules:
+  line-length:
+    max: 200
+    level: warning
+
+  truthy:
+    allowed-values: ['true', 'false', 'on']
+    check-keys: false
+
+  empty-values: disable
+  document-start: disable
+
+  comments:
+    min-spaces-from-content: 1
+
+  # Allow either compact or indented list style.
+  # Kubernetes manifests typically use compact:
+  #   nodes:
+  #   - role: control-plane
+  # GitHub Actions workflows use indented:
+  #   steps:
+  #     - uses: actions/checkout@v4
+  # Both are valid YAML; yamllint just wants consistency within a file.
+  indentation:
+    indent-sequences: consistent
+
+ignore: |
+  .git/
+  node_modules/

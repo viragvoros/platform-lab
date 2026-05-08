@@ -1,13 +1,47 @@
-# Validate Kubernetes manifests and kustomize overlays.
+# Run pre-commit hooks (shellcheck, yamllint, kubeconform, hygiene checks)
+# on every push and pull request that touches manifests, scripts, or workflows.
 name: manifests-lint
+
 on:
   push:
-    paths: ['apps/**', 'infra/**', '.github/workflows/manifests-lint.yaml']
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - 'infra/**'
+      - 'scripts/**'
+      - '.github/workflows/**'
+      - '.pre-commit-config.yaml'
+      - '.yamllint.yaml'
+      - '.shellcheckrc'
   pull_request:
-    paths: ['apps/**', 'infra/**']
+    paths:
+      - 'apps/**'
+      - 'infra/**'
+      - 'scripts/**'
+      - '.github/workflows/**'
+      - '.pre-commit-config.yaml'
+      - '.yamllint.yaml'
+      - '.shellcheckrc'
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # TODO: kubeconform, kustomize build, helm lint
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install kubeconform
+        run: |
+          KUBECONFORM_VER=v0.6.7
+          curl -Lo /tmp/kubeconform.tar.gz \
+            "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VER}/kubeconform-linux-amd64.tar.gz"
+          tar -xzf /tmp/kubeconform.tar.gz -C /tmp kubeconform
+          sudo install -m 755 /tmp/kubeconform /usr/local/bin/kubeconform
+          kubeconform -v
+
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.1

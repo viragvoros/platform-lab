@@ -1,0 +1,8 @@
+# Treat all scripts as bash (we don't write POSIX sh scripts).
+shell=bash
+
+# External sources are fine — we don't need shellcheck to follow them.
+external-sources=true
+
+# Default severity. Disable individual checks here if needed:
+# disable=SC1090

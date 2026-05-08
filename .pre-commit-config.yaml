@@ -1,0 +1,38 @@
+# Hooks run before every commit. Install once with: pre-commit install
+# Run all hooks against the whole repo with: pre-commit run --all-files
+
+repos:
+  # General hygiene — trim whitespace, ensure final newline, check YAML syntax
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: detect-private-key
+
+  # Bash linting
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+
+  # YAML linting (uses our .yamllint.yaml config)
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [--strict]
+
+  # kubeconform doesn't have an official pre-commit repo, so use a local hook.
+  - repo: local
+    hooks:
+      - id: kubeconform
+        name: kubeconform
+        entry: bash -c 'find apps infra -name "*.yaml" -not -path "*/kind/*" -print0 | xargs -0 kubeconform -strict -summary -ignore-missing-schemas'
+        language: system
+        pass_filenames: false
