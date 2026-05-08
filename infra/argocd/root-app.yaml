@@ -1,0 +1,26 @@
+# The "app of apps" — Argo CD Application that manages OTHER Applications.
+# Apply this once with kubectl. From that moment, anything added under
+# apps/_apps/ is automatically picked up by Argo CD.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/viragvoros/platform-lab.git
+    targetRevision: main
+    path: apps/_apps                        # directory of child Applications
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd                       # child Applications live in argocd ns
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

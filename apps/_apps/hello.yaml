@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hello
+  namespace: argocd
+  # Finalizer ensures Argo CD cleans up cluster resources if this Application
+  # is deleted. Without it, deleting the Application leaves the workload running.
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/viragvoros/platform-lab.git
+    targetRevision: main
+    path: apps/hello
+
+  destination:
+    server: https://kubernetes.default.svc   # the cluster Argo CD itself runs in
+    namespace: hello                          # default namespace if manifests don't specify
+
+  syncPolicy:
+    automated:
+      prune: true                             # delete resources removed from git
+      selfHeal: true                          # revert manual cluster changes
+    syncOptions:
+    - CreateNamespace=true                    # auto-create the namespace if missing
