@@ -54,8 +54,16 @@ log "Applying Argo CD ingress"
 kubectl apply -f "${REPO_ROOT}/infra/argocd/ingress.yaml"
 
 # ---------- 4. Root app (app-of-apps) ----------
-# Will be added in step 4 of phase 1.
-# kubectl apply -f "${REPO_ROOT}/infra/argocd/root-app.yaml"
+# Bootstraps GitOps: this is the LAST imperative apply.
+# From here, everything is managed via git.
+log "Applying root Application (app-of-apps)"
+kubectl apply -f "${REPO_ROOT}/infra/argocd/root-app.yaml"
+
+log "Waiting for root Application to sync"
+# Give Argo CD a few seconds to register, then wait for child apps to appear
+sleep 5
+kubectl wait --for=condition=available --timeout=120s \
+  -n argocd application/root 2>/dev/null || true
 
 # ---------- 5. /etc/hosts reminder ----------
 if ! grep -q "argocd.localtest.me" /etc/hosts; then
