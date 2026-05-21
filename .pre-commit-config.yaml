@@ -33,6 +33,6 @@ repos:
     hooks:
       - id: kubeconform
         name: kubeconform
-        entry: bash -c 'find apps infra -name "*.yaml" -not -path "*/kind/*" -print0 | xargs -0 kubeconform -strict -summary -ignore-missing-schemas'
+        entry: bash -c 'find apps infra -name "*.yaml" -not -path "*/kind/*" -not -name "*values*.yaml" -print0 | xargs -0 kubeconform -strict -summary -ignore-missing-schemas'
         language: system
         pass_filenames: false

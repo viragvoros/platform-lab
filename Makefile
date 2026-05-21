@@ -68,7 +68,10 @@ lint-yaml: ## Lint YAML files with yamllint
 
 .PHONY: lint-k8s
 lint-k8s: ## Validate Kubernetes manifests with kubeconform
-	@find apps infra -name '*.yaml' -not -path '*/kind/*' -print0 \
+	@find apps infra -name '*.yaml' \
+		-not -path '*/kind/*' \
+		-not -name '*values*.yaml' \
+		-print0 \
 		| xargs -0 kubeconform -strict -summary -ignore-missing-schemas
 
 # ---------- Convenience ----------

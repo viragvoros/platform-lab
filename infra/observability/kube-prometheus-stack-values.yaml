@@ -1,0 +1,64 @@
+# Helm values for kube-prometheus-stack.
+# Tuned for a local kind cluster / future Raspberry Pi (modest resources).
+
+# --- Grafana ---
+grafana:
+  # Admin password. For a local lab this is fine; in a real setup
+  # this would come from a Secret from external-secrets.
+  adminPassword: admin
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.localtest.me
+    path: /
+    pathType: Prefix
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# --- Prometheus ---
+prometheus:
+  prometheusSpec:
+    # Keep 6h of data locally, enough for a lab, light on disk.
+    retention: 6h
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+        # Using emptyDir (default) rather than a PersistentVolume: data is lost
+        # on pod restart, acceptable for a disposable lab cluster.
+
+# --- Alertmanager ---
+# We don't need alerting routes in a lab, but keep it running so the stack
+# is complete and dashboards referencing it don't break.
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 64Mi
+
+# --- kube-state-metrics ---
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
+
+# --- node-exporter ---
+nodeExporter:
+  enabled: true
