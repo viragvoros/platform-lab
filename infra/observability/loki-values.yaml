@@ -1,0 +1,62 @@
+# Loki in SingleBinary mode — one pod, filesystem storage.
+# Ideal for a small kind cluster / Raspberry Pi. Not for production scale.
+
+deploymentMode: SingleBinary
+
+loki:
+  # Use the filesystem for chunk storage (no object store like S3 needed).
+  storage:
+    type: filesystem
+  # Required schema config for recent Loki versions.
+  schemaConfig:
+    configs:
+    - from: "2024-01-01"
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+  # Single-node setup: no replication, minimal limits.
+  commonConfig:
+    replication_factor: 1
+  # Disable multi-tenancy auth for a simple lab setup.
+  auth_enabled: false
+  limits_config:
+    retention_period: 24h          # keep 1 day of logs; light on disk
+
+# SingleBinary: run exactly one replica.
+singleBinary:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+  persistence:
+    enabled: false                 # emptyDir — logs lost on restart, fine for lab
+
+# Disable the components we don't use in SingleBinary mode.
+read:
+  replicas: 0
+write:
+  replicas: 0
+backend:
+  replicas: 0
+
+# We don't need the self-monitoring / canary extras for a lab.
+chunksCache:
+  enabled: false
+resultsCache:
+  enabled: false
+lokiCanary:
+  enabled: false
+test:
+  enabled: false
+monitoring:
+  selfMonitoring:
+    enabled: false
+    grafanaAgent:
+      installOperator: false

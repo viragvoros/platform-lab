@@ -1,0 +1,23 @@
+# Promtail — runs as a DaemonSet (one pod per node), reads container logs,
+# and ships them to Loki.
+
+config:
+  clients:
+  # Point Promtail at the Loki service. Name/namespace must match the
+  # Loki chart's service: <release>.<namespace>.svc:3100
+  - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+
+resources:
+  requests:
+    cpu: 20m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+# Tolerate the control-plane taint so Promtail also collects logs from
+# the control-plane node (where ingress-nginx and others run).
+tolerations:
+- key: node-role.kubernetes.io/control-plane
+  operator: Exists
+  effect: NoSchedule
